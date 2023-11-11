@@ -6,6 +6,8 @@
 #include <functional>
 #include <memory>
 
+// unique_ptrのベクタ配列の要素に対する変更をラムダ式を介して行えるか確認。
+
 struct Person
 {
     int age;
