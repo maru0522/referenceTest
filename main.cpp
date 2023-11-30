@@ -6,36 +6,35 @@
 #include <functional>
 #include <memory>
 
-// unique_ptrのベクタ配列の要素に対する変更をラムダ式を介して行えるか確認。
+// ptrの参照先が無効なアドレスか識別する方法
 
-struct Person
+class A
 {
-    int age;
-    std::string name;
+public:
+    int num;
+    std::string id;
 };
 
-int main(void)
+int main()
 {
-    std::vector<std::unique_ptr<Person>> vector_persons_;
-    vector_persons_.emplace_back(std::make_unique<Person>());
-    vector_persons_.emplace_back(std::make_unique<Person>());
-    vector_persons_.emplace_back(std::make_unique<Person>());
-    vector_persons_.back()->age = 10;
+    A* insAPtr = nullptr;
 
-    for (auto& a : vector_persons_)
     {
-        std::cout << a->age << std::endl;
+        std::unique_ptr<A> instanceA = std::make_unique<A>();
+        instanceA->num = 10;
+        instanceA->id = "im a";
+
+        insAPtr = instanceA.get();
+        instanceA.reset();
     }
 
-    std::function<bool(const std::unique_ptr<Person>&)> f = [&](const std::unique_ptr<Person>& arg_up_p) {return arg_up_p->age == 10; };
-    //std::erase_if(vector_persons_, f);
-    vector_persons_.erase(std::remove_if(vector_persons_.begin(), vector_persons_.end(), f), vector_persons_.end());
-
-    std::cout << "deleted" << std::endl;
-
-    for (auto& a : vector_persons_)
-    {
-        std::cout << a->age << std::endl;
+    // insAPtrの参照するアドレスが無効になっていない場合
+    if (insAPtr != nullptr) {
+        std::cout << "alivePtr : " << insAPtr->num << std::endl;
+    }
+    // 無効になっている場合
+    else {
+        std::cout << "not alivePtr" << std::endl;
     }
 
     return 0;
