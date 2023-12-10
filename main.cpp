@@ -1,40 +1,39 @@
-#include <stdlib.h>
-#include <cstdint>
-#include <unordered_map>
-#include <string>
 #include <iostream>
-#include <functional>
-#include <memory>
+#include <future>
+#include <thread>
 
-// ptrの参照先が無効なアドレスか識別する方法
+// std::asyncの使い方を探る
+// https://cpprefjp.github.io/reference/future/async.html
 
-class A
-{
-public:
-    int num;
-    std::string id;
-};
+int foo() { std::cout << "executes foo()\n"; return 3; }
 
 int main()
 {
-    A* insAPtr = nullptr;
-
+    // 新たなスレッドで関数foo()を非同期実行
     {
-        std::unique_ptr<A> instanceA = std::make_unique<A>();
-        instanceA->num = 10;
-        instanceA->id = "im a";
-
-        insAPtr = instanceA.get();
-        instanceA.reset();
+        std::cout << "invokes std::async(std::launch::async, foo)" << std::endl;
+        std::future<int> f = std::async(std::launch::async, foo);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::cout << "main thread: slept for 10 msec\n";
+        // 非同期実行の結果を取得
+        int result = f.get();
+        std::cout << "foo() = " << result << std::endl;
     }
 
-    // insAPtrの参照するアドレスが無効になっていない場合
-    if (insAPtr != nullptr) {
-        std::cout << "alivePtr : " << insAPtr->num << std::endl;
-    }
-    // 無効になっている場合
-    else {
-        std::cout << "not alivePtr" << std::endl;
+    std::cout << std::endl;
+
+    // 関数fを遅延状態で非同期実行
+    {
+        // この段階では関数foo()を実行しない
+        std::cout << "invokes std::async(std::launch::deferred, foo)" << std::endl;
+        std::future<int> f = std::async(std::launch::deferred, foo);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::cout << "main thread: slept for 10 msec\n";
+
+        // 非同期実行の結果を取得
+        // この段階で関数foo()を実行
+        int result = f.get();
+        std::cout << "foo() = " << result << std::endl;
     }
 
     return 0;
