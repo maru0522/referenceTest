@@ -4,27 +4,30 @@
 #include <algorithm>
 #include <string>
 
-// stdfindの仕様について知る
+// stdmoveの仕様について知る
 
-struct TestA
+struct A
 {
-    std::string id_;
+    A() {}
+
+    // 左辺値からコピー
+    A(const A&)
+    {
+        std::cout << "copy" << std::endl;
+    }
+
+    // 右辺値からムーブ
+    A(A&&)
+    {
+        std::cout << "move" << std::endl;
+    }
 };
 
 int main()
 {
-    std::vector<TestA> vec1;
-    vec1.emplace_back();
-    vec1.back().id_ = "AAAAA";
-    std::cout << vec1.back().id_ << std::endl;
-    //auto itr1 = std::find(vec1.begin(), vec1.end(), "AAAAA");
-    //std::cout << itr1->id_ << std::endl;
-
-
-    std::vector<int> vec2 = { 1,2,3,4,5 };
-    auto itr2 = std::find(vec2.begin(), vec2.end(), 5);
-    std::cout << *itr2 << std::endl;
-
+    std::unique_ptr<A> a1 = nullptr;
+    if (a1.get() == nullptr) { std::cout << "a1.get() == nullptr"; }
+    if (a1 == nullptr) { std::cout << "a1 == nullptr"; }
 
     return 0;
 }
